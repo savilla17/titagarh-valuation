@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Titagarh Rail Systems (NSEI:TITAGARH) Stock Valuation - Simply Wall St</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #2d3748;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .company-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .company-subtitle {
+            font-size: 1.1rem;
+            color: #718096;
+            margin-bottom: 20px;
+        }
+
+        .valuation-score {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .score-badge {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .score-text {
+            font-size: 1.1rem;
+            color: #4a5568;
+        }
+
+        .current-price {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .price-change {
+            color: #e53e3e;
+            font-weight: 600;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metric {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            border-radius: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        .metric:hover {
+            transform: scale(1.05);
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: #718096;
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .positive {
+            color: #38a169;
+            font-weight: 600;
+        }
+
+        .negative {
+            color: #e53e3e;
+            font-weight: 600;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 20px;
+        }
+
+        .insight-box {
+            background: linear-gradient(135deg, #edf2f7, #e2e8f0);
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .insight-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .insight-text {
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        .analyst-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .analyst-card {
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+
+        .analyst-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .target-price {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .upside {
+            color: #38a169;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .company-title {
+                font-size: 2rem;
+            }
+            
+            .metric-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .glow {
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 0 20px rgba(102, 126, 234, 0.3); }
+            to { box-shadow: 0 0 30px rgba(102, 126, 234, 0.6); }
+        }
+
+        .data-update {
+            font-size: 0.8rem;
+            color: #718096;
+            text-align: right;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header glow">
+            <h1 class="company-title">Titagarh Rail Systems</h1>
+            <p class="company-subtitle">Is TITAGARH undervalued compared to its fair value, analyst forecasts and its price relative to the market?</p>
+            
+            <div class="valuation-score">
+                <span class="score-badge">1/6</span>
+                <span class="score-text">Valuation Score - Below Fair Value</span>
+            </div>
+            
+            <div class="current-price">₹879.25</div>
+            <div class="price-change">Significantly Below Fair Value</div>
+        </header>
+
+        <div class="content-grid">
+            <div class="main-content">
+                <div class="card">
+                    <h2 class="card-title">Share Price vs Fair Value</h2>
+                    <p>What is the Fair Price of TITAGARH when looking at its future cash flows? For this estimate we use a Discounted Cash Flow model.</p>
+                    
+                    <div class="chart-container">
+                        <canvas id="fairValueChart"></canvas>
+                    </div>
+                    
+                    <div class="insight-box">
+                        <div class="insight-title">Below Fair Value:</div>
+                        <div class="insight-text">TITAGARH (₹879.25) is trading above our estimate of fair value (₹191.88)</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Price-To-Earnings vs Peers</h2>
+                    <p>How does TITAGARH's PE Ratio compare to its peers?</p>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Company</th>
+                                    <th>Forward PE</th>
+                                    <th>Estimated Growth</th>
+                                    <th>Market Cap</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Peer Average</strong></td>
+                                    <td><strong>60.5x</strong></td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>Company A</td>
+                                    <td>30.4x</td>
+                                    <td class="positive">7.11%</td>
+                                    <td>₹128.5b</td>
+                                </tr>
+                                <tr>
+                                    <td>Company B</td>
+                                    <td>90.6x</td>
+                                    <td class="positive">52.80%</td>
+                                    <td>₹127.7b</td>
+                                </tr>
+                                <tr>
+                                    <td>Company C</td>
+                                    <td>44.2x</td>
+                                    <td class="positive">19.62%</td>
+                                    <td>₹142.8b</td>
+                                </tr>
+                                <tr>
+                                    <td>Company D</td>
+                                    <td>76.7x</td>
+                                    <td class="positive">32.52%</td>
+                                    <td>₹161.7b</td>
+                                </tr>
+                                <tr style="background: rgba(102, 126, 234, 0.1);">
+                                    <td><strong>TITAGARH</strong></td>
+                                    <td><strong>49.1x</strong></td>
+                                    <td class="positive"><strong>30.62%</strong></td>
+                                    <td><strong>₹118.4b</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="insight-box">
+                        <div class="insight-title">Price-To-Earnings vs Peers:</div>
+                        <div class="insight-text">TITAGARH is good value based on its Price-To-Earnings Ratio (49.1x) compared to the peer average (60.5x).</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Analyst Price Targets</h2>
+                    <p>What is the analyst 12-month forecast and do we have any statistical confidence in the consensus price target?</p>
+                    
+                    <div class="analyst-grid">
+                        <div class="analyst-card">
+                            <div class="target-price">₹1,037.00</div>
+                            <div class="upside">+17.94%</div>
+                            <div>Average Target</div>
+                        </div>
+                        <div class="analyst-card">
+                            <div class="target-price">₹1,142.00</div>
+                            <div class="upside">High Target</div>
+                        </div>
+                        <div class="analyst-card">
+                            <div class="target-price">₹946.00</div>
+                            <div>Low Target</div>
+                        </div>
+                        <div class="analyst-card">
+                            <div class="target-price">6</div>
+                            <div>Analysts</div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="analystChart"></canvas>
+                    </div>
+                    
+                    <div class="insight-box">
+                        <div class="insight-title">Analyst Forecast:</div>
+                        <div class="insight-text">Target price is less than 20% higher than the current share price.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="card">
+                    <h3 class="card-title">Key Valuation Metrics</h3>
+                    <p style="margin-bottom: 15px; font-size: 0.9rem; color: #718096;">As TITAGARH is profitable we use its Price-To-Earnings Ratio for relative valuation analysis.</p>
+                    
+                    <div class="metric-grid">
+                        <div class="metric">
+                            <div class="metric-label">PE Ratio</div>
+                            <div class="metric-value">49.1x</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Earnings</div>
+                            <div class="metric-value">₹2.41b</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Market Cap</div>
+                            <div class="metric-value">₹118.41b</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">EV/Revenue</div>
+                            <div class="metric-value">3.3x</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">EV/EBITDA</div>
+                            <div class="metric-value">29.6x</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">PEG Ratio</div>
+                            <div class="metric-value">1.6x</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">PE Ratio vs Fair Ratio</h3>
+                    <div class="metric-grid">
+                        <div class="metric">
+                            <div class="metric-label">Current PE Ratio</div>
+                            <div class="metric-value">49.1x</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Fair PE Ratio</div>
+                            <div class="metric-value">46.2x</div>
+                        </div>
+                    </div>
+                    <div class="insight-box">
+                        <div class="insight-title">Price-To-Earnings vs Fair Ratio:</div>
+                        <div class="insight-text">TITAGARH is expensive based on its Price-To-Earnings Ratio (49.1x) compared to the estimated Fair Price-To-Earnings Ratio (46.2x).</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">Industry Comparison</h3>
+                    <div class="metric-grid">
+                        <div class="metric">
+                            <div class="metric-label">TITAGARH PE</div>
+                            <div class="metric-value">49.1x</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Industry Average</div>
+                            <div class="metric-value">31.3x</div>
+                        </div>
+                    </div>
+                    <div class="insight-box">
+                        <div class="insight-title">Price-To-Earnings vs Industry:</div>
+                        <div class="insight-text">TITAGARH is expensive based on its Price-To-Earnings Ratio compared to the Indian Machinery industry average.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title">Data Sources & Updates</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Last Updated (UTC)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Company Analysis</td>
+                            <td>2025/09/27 08:54</td>
+                        </tr>
+                        <tr>
+                            <td>End of Day Share Price</td>
+                            <td>2025/09/26 00:00</td>
+                        </tr>
+                        <tr>
+                            <td>Earnings</td>
+                            <td>2025/06/30</td>
+                        </tr>
+                        <tr>
+                            <td>Annual Earnings</td>
+                            <td>2025/03/31</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="data-update">
+                Data provided by S&P Global Market Intelligence LLC • Analysis by Simply Wall St
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fair Value Chart
+        const fairValueCtx = document.getElementById('fairValueChart').getContext('2d');
+        new Chart(fairValueCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Fair Value', 'Current Price'],
+                datasets: [{
+                    label: 'Price (₹)',
+                    data: [191.88, 879.25],
+                    backgroundColor: [
+                        'rgba(102, 126, 234, 0.8)',
+                        'rgba(238, 90, 36, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(102, 126, 234, 1)',
+                        'rgba(238, 90, 36, 1)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+
+        // Analyst Price Target Chart
+        const analystCtx = document.getElementById('analystChart').getContext('2d');
+        new Chart(analystCtx, {
+            type: 'line',
+            data: {
+                labels: ['Sep 24', 'Dec 24', 'Mar 25', 'Jun 25', 'Sep 25', 'Current'],
+                datasets: [{
+                    label: 'Share Price',
+                    data: [814.80, 979.75, 934.35, 1415.70, 1423.80, 879.25],
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }, {
+                    label: 'Analyst Target',
+                    data: [785.25, 992.00, 1244.00, 1402.40, 1798.20, 1037.00],
+                    borderColor: 'rgba(56, 161, 105, 1)',
+                    backgroundColor: 'rgba(56, 161, 105, 0.1)',
+                    fill: false,
+                    tension: 0.4,
+                    borderDash: [5, 5]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+
+        // Add smooth scrolling and interactive elements
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+                this.style.transition = 'all 0.3s ease';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Add loading animation
+        window.addEventListener('load', function() {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(50px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
